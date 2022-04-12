@@ -39,8 +39,8 @@ void printArray(vector<int> &arr)
         cout << i + 1 << ". " << arr[i] << endl;
     cout << "\n";
 }
-
-void zapis(vector<int> &arr)
+// test askjdgalkjseyrgsal
+void zapis(vector<int> &arr, char name)
 {
     FILE *fwrite;
     int i = 0;
@@ -49,6 +49,7 @@ void zapis(vector<int> &arr)
     struct tm *info;
     char buffer1[80];
     char buffer2[80];
+    char test[1];
 
     if (asprintf(&num, "%d", N) == -1)
     {
