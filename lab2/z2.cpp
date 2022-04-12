@@ -33,55 +33,84 @@ void countSort(vector<int> &arr)
         arr[i] = output[i];
 }
 
-void printArray(vector<int> &arr)
+void heapify(std::vector<int> &arr, int size, int i)
 {
-    for (int i = 0; i < arr.size(); i++)
-        cout << i + 1 << ". " << arr[i] << endl;
-    cout << "\n";
+    int max = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+    if (left < size && arr[left] > arr[max])
+        max = left;
+    if (right < size && arr[right] > arr[max])
+        max = right;
+    if (max != i)
+    {
+        int temp = arr[i];
+        arr[i] = arr[max];
+        arr[max] = temp;
+        heapify(arr, size, max);
+    }
 }
-// test askjdgalkjseyrgsal
-void zapis(vector<int> &arr, char name)
+
+void heapSort(std::vector<int> &arr)
+{
+    int size = arr.size();
+
+    for (int i = size / 2 - 1; i >= 0; i--)
+    {
+        heapify(arr, size, i);
+    }
+
+    for (int i = size - 1; i >= 0; i--)
+    {
+        int temp = arr[0];
+        arr[0] = arr[i];
+        arr[i] = temp;
+
+        heapify(arr, i, 0);
+    }
+}
+
+void zapis(vector<int> &arr, string name, int iter)
 {
     FILE *fwrite;
     int i = 0;
     char *num;
+    string liczb;
     time_t rawtime;
     struct tm *info;
     char buffer1[80];
     char buffer2[80];
-    char test[1];
 
-    if (asprintf(&num, "%d", N) == -1)
-    {
-        perror("asprintf");
-    }
-    else
-    {
-        strcat(strcpy(buffer2, name), num);
-        printf("%s\n", buffer2);
-        free(num);
-    }
-
-    name = buffer2;
+    liczb = to_string(iter);
+    name = name + liczb;
     time(&rawtime);
     info = localtime(&rawtime);
     strftime(buffer1, 80, "-%Y-%m-%d-%H-%M-%S", info);
-    strcat(name, buffer1);
-    strcat(name, ".ini");
 
-    fwrite = fopen(name, "w");
+    name = name + buffer1 + ".ini";
+    const char *str = name.c_str();
+
+    fwrite = fopen(str, "w");
     if (fwrite == NULL)
     {
         printf("Blad odczytu!");
         exit(1);
     }
-    for (i = 0; i < N; i++)
+    for (i = 0; i < iter; i++)
     {
-        fprintf(fwrite, "%d, ", array[i]);
+        fprintf(fwrite, "%d, ", arr[i]);
     }
     fclose(fwrite);
-    system("cls");
-    printf("Zapisano do pliku: %s\n", name);
+    // cout << "Zapis: " << name << endl;
+}
+
+template <typename T>
+vector<T> slice(vector<T> const &v, int m, int n)
+{
+    auto first = v.cbegin() + m;
+    auto last = v.cbegin() + n + 1;
+    vector<T> vec(first, last);
+    return vec;
 }
 
 int main(int argc, char const *argv[])
@@ -100,24 +129,33 @@ int main(int argc, char const *argv[])
         fscanf(file, "%d, ", &nn);
         liczby.push_back(nn);
     }
-    t = clock();
-    countSort(liczby);
-    t = clock() - t;
-    double czas = ((double)t) / CLOCKS_PER_SEC;
-    printf("Czas wykonania: %f\n", czas);
 
-    // printArray(liczby);
-    char x;
-    cout << "Posortowano" << endl
-         << "Zapisac do pliku? < T / N > ";
-    cin >> x;
-    if (x == 'T')
+    int testy[] = {1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000};
+
+    cout << "Sortowanie przez zliczanie:" << endl;
+    for (int i = 0; i < 10; i++)
     {
-        zapis();
-    }
-    {
-        /* code */
+        vector<int> sub_vec = slice(liczby, 0, testy[i]);
+        t = clock();
+        countSort(sub_vec);
+        t = clock() - t;
+        double czas = ((double)t) / CLOCKS_PER_SEC;
+        zapis(sub_vec, "Zliczanie-N", testy[i]);
+        cout << "Czas wykonania dla N=" << testy[i] << ": " << czas << endl;
     }
 
+    cout << endl << "Sortowanie przez kopcowanie" << endl;
+    for (int i = 0; i < 10; i++)
+    {
+        vector<int> sub_vec = slice(liczby, 0, testy[i]);
+        t = clock();
+        heapSort(sub_vec);
+        t = clock() - t;
+        double czas = ((double)t) / CLOCKS_PER_SEC;
+        zapis(sub_vec, "Kopcowanie-N", testy[i]);
+        cout << "Czas wykonania dla N=" << testy[i] << ": " << czas << endl;
+    }
+    getchar();
+    
     return 0;
 }
