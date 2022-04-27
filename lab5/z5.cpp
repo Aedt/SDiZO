@@ -28,7 +28,15 @@ void printSolution(int dist[])
 {
     cout << "Vertex \t Distance from Source" << endl;
     for (int i = 0; i < V; i++)
-        cout << i << " \t\t" << dist[i] << endl;
+        if (dist[i] == INT_MAX)
+        {
+            cout << i << " \t\t"
+                 << "no connection between vertices" << endl;
+        }
+        else
+        {
+            cout << i << " \t\t" << dist[i] << endl;
+        }
 }
 
 void dijkstra(int **graph, int src)
@@ -53,13 +61,12 @@ void dijkstra(int **graph, int src)
     }
 
     printSolution(dist);
-    
 }
 
 int main()
 {
     clock_t start, end;
-	double cpu_time;
+    double cpu_time;
 
     int dist[V];
     int size = 1000;
@@ -89,7 +96,6 @@ int main()
         }
     }
     fclose(file);
-
 
     start = clock();
 
