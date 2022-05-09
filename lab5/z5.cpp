@@ -10,11 +10,12 @@
 #include <cstring>
 using namespace std;
 
-#define V 10
+#define V 6
 
 int minDistance(int dist[], bool sptSet[])
 {
 
+    // Initialize min value
     int min = INT_MAX, min_index;
 
     for (int v = 0; v < V; v++)
@@ -26,7 +27,7 @@ int minDistance(int dist[], bool sptSet[])
 
 void printSolution(int dist[])
 {
-    cout << "Vertex \t Distance from Source" << endl;
+    cout << "Vertex \tDistance from Source" << endl;
     for (int i = 0; i < V; i++)
         if (dist[i] == INT_MAX)
         {
@@ -44,12 +45,16 @@ void dijkstra(int **graph, int src)
     int dist[V];
     bool sptSet[V];
     for (int i = 0; i < V; i++)
-        dist[i] = INT_MAX, sptSet[i] = false;
+    {
+        dist[i] = INT_MAX;
+        sptSet[i] = false;
+    }
 
     dist[src] = 0;
 
     for (int count = 0; count < V - 1; count++)
     {
+
         int u = minDistance(dist, sptSet);
 
         sptSet[u] = true;
