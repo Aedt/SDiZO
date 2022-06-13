@@ -3,7 +3,7 @@
 #include <time.h>
 #include <string.h>
 
-#define N 1000000
+#define N 10
 
 void swap(int *a, int *b)
 {
