@@ -8,9 +8,11 @@
 #include <time.h>
 #include <string>
 #include <cstring>
+#include <limits.h>
 using namespace std;
 
-#define V 6
+
+#define V 1000
 
 int minDistance(int dist[], bool sptSet[])
 {
@@ -52,7 +54,7 @@ void dijkstra(int **graph, int src)
 
     dist[src] = 0;
 
-    for (int count = 0; count < V - 1; count++)
+    for (int count = 0; count < V-1; count++)
     {
 
         int u = minDistance(dist, sptSet);
@@ -61,17 +63,20 @@ void dijkstra(int **graph, int src)
 
         for (int v = 0; v < V; v++)
 
-            if (!sptSet[v] && graph[u][v] && dist[u] != INT_MAX && dist[u] + graph[u][v] < dist[v])
+            if (!sptSet[v] && graph[u][v] && dist[u] != INT_MAX && dist[u] + graph[u][v] < dist[v]){
                 dist[v] = dist[u] + graph[u][v];
+                
+            }
     }
-
+    cout << endl;
     printSolution(dist);
 }
 
+
 int main()
 {
-    clock_t start, end;
-    double cpu_time;
+    clock_t t;
+    
 
     int dist[V];
     int size = 1000;
@@ -81,7 +86,7 @@ int main()
         graf[i] = new int[size];
     }
     FILE *file;
-    file = fopen("macierzDodatnie.txt", "r");
+    file = fopen("skierowana.txt", "r");
 
     if (file == NULL)
     {
@@ -102,19 +107,31 @@ int main()
     }
     fclose(file);
 
-    start = clock();
+    t = clock();
 
     dijkstra(graf, 0);
 
-    end = clock();
+    t = clock() - t;
 
-    cpu_time = ((double)(end - start)) / CLOCKS_PER_SEC;
-    cout << "exec time: " << cpu_time << endl;
+    double czas = ((double)t) / CLOCKS_PER_SEC;
+    cout << "exec time: " << czas << endl;
+
+
+    // for(int i = 0; i < V; i++){
+    //     for(int j = 0; j < V; j++){
+    //         cout << graf[i][j] << "; ";
+    //     }
+    //     cout << endl;
+    // }
+    
     for (int i = 0; i < size; ++i)
     {
         delete[] graf[i];
     }
+
+    
     delete[] graf;
 
+    getchar();
     return 0;
 }

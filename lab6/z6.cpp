@@ -1,20 +1,22 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <math.h> 
+#include <time.h>
 #include <string>
 
 using namespace std;
 
-#define N 10
+#define NN 10
 // BST
 struct BSTreeNode
 {
-    string key;
+    int key;
     struct BSTreeNode *left{};
     struct BSTreeNode *right{};
 };
 
-void insertNode(BSTreeNode *&root, const string &k)
+void insertNode(BSTreeNode *&root, const int &k)
 {
     if (root == nullptr)
     {
@@ -25,7 +27,7 @@ void insertNode(BSTreeNode *&root, const string &k)
     }
     else
     {
-        if (k.compare(root->key) < 0)
+        if (k < (root->key))
             insertNode(root->left, k);
         else
             insertNode(root->right, k);
@@ -41,7 +43,7 @@ BSTreeNode *findMaximumKey(BSTreeNode *ptr)
     return ptr;
 }
 
-void deleteNode(BSTreeNode *&root, const string &k)
+void deleteNode(BSTreeNode *&root, const int &k)
 {
     // base case: the key is not found in the tree
     if (root == nullptr)
@@ -50,13 +52,13 @@ void deleteNode(BSTreeNode *&root, const string &k)
     }
 
     // if the given key is less than the root node, recur for the left subtree
-    if (k.compare(root->key) < 0)
+    if (k < (root->key))
     {
         deleteNode(root->left, k);
     }
 
     // if the given key is more than the root node, recur for the right subtree
-    else if (k.compare(root->key) > 0)
+    else if (k > (root->key))
     {
         deleteNode(root->right, k);
     }
@@ -116,52 +118,95 @@ void saveTreeBST(BSTreeNode *n, FILE *outFile)
 {
     if (n != nullptr)
     {
+        
         saveTreeBST(n->left, outFile);
-        fprintf(outFile, "%s\n", n->key.c_str());
+        fprintf(outFile, "%d\n", n->key);
         saveTreeBST(n->right, outFile);
     }
 }
 
 void saveBST(BSTreeNode *n)
 {
-    FILE *outFile = fopen("words_out_BST.txt", "w");
+    FILE *outFile = fopen("out_BST.txt", "w");
     saveTreeBST(n, outFile);
     fclose(outFile);
+}
+
+int saveTime(int in, float procent, double czasTworzenia, double czasUsuwania){
+    in++;
+    FILE *file;
+    char* buff;
+    file = fopen("czasy.ini", "a");
+    if (file==NULL)
+    {
+        cout << "Blad pliku 'czasy.txt'" << endl;
+        return 1;
+    }
+
+    string tekst;
+    tekst = "Wielkosc drzewa: " + to_string(in) + "; usuniety procent: " 
+            + to_string(procent) + "; czas tworzenia drzewa: " + to_string(czasTworzenia) 
+            + "; czas usuwania: " + to_string(czasUsuwania) + "\n";
+    cout << tekst << endl;
+    buff = &tekst[0];
+    fputs(buff, file);
+    fclose(file);
+
 }
 
 
 int main()
 {
-    vector<string> words;
+    clock_t t,t2;
+    vector<int> words;
     ifstream file;
-    file.open("shuffled_words_alpha.txt");
+    int in;
+    float procent;
+    
+
+
+    file.open("liczby_shuf.txt");
     if (!file.is_open())
     {
-        cout << "File error" << endl;
+        cout << "Blad pliku z danymi" << endl;
         return 1;
     }
-    string word;
+    int word;
     while (file >> word)
         words.push_back(word);
 
     BSTreeNode *root = nullptr;
 
-    // for (int i = 0; i < N; i++)
-    // {
-    //     insertNode(root, words.at(i));
-    // }
-    for (const auto &item : words)
+    cout << "wielkosc drzewa (max 500 000): ";
+    cin >> in;
+    in--;
+    cout << "procent drzewa do usuniecia(0-1): ";
+    cin >> procent;
+
+    t = clock();
+    for (int i = 0; i < in; i++)
     {
-        insertNode(root, item);
+        insertNode(root, words.at(i));
     }
+    t = clock() - t;
+    double czasTworzenia = ((double)t) / CLOCKS_PER_SEC;
+    // for (const auto &item : words)
+    // {
+    //     insertNode(root, item);
+    // }
 
-    // printTree(root);
-
-    for (int i = 370104; i > (370104 - 17400); i--)
+    // printTreeBST(root);
+    t2 = clock();
+    for (int i = in; i >= (in - floor(in*procent)); i--)
     {
         deleteNode(root, words.at(i));
     }
-    saveBST(root);
+    t2 = clock() - t2;
+    double czasUsuwania = ((double)t2) / CLOCKS_PER_SEC;
 
+    saveBST(root);
+    saveTime(in, procent, czasTworzenia, czasUsuwania);
+    getchar();
+    getchar();
     return 0;
 }
